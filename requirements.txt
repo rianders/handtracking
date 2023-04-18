@@ -1,3 +1,8 @@
 cvzone
 opencv-python
 mediapipe
+torch
+torchvision
+pillow
+
+

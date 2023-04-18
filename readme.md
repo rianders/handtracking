@@ -11,6 +11,9 @@ Then install project software
 Set up virtual environment on Windows
 `./env/scripts/activate`
 
+Set up virtual on Mac/Unix
+`source ./env/bin/activate`
+
 Then install project software
 `pip install -r requirements.txt`
 
