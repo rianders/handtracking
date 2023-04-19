@@ -16,17 +16,20 @@ trf = T.Compose([T.Resize(256),
                  T.ToTensor(),
                  T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
 
-
-def segment_human(image, model):
+def segment_human(image, model, resize_shape=(224, 224)):
+    # Resize the input image for segmentation
+    image_resized = cv2.resize(image, resize_shape)
     # Convert OpenCV image (NumPy array) to PIL Image
-    image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    image_pil = Image.fromarray(cv2.cvtColor(image_resized, cv2.COLOR_BGR2RGB))
     
-    input_image = trf(image).unsqueeze(0)
+    input_image = trf(image_pil).unsqueeze(0)
     with torch.no_grad():
         output = model(input_image)['out'][0]
     output_predictions = output.argmax(0).byte().cpu().numpy()
-    # Return binary mask for human class (class index 15)
-    return output_predictions == 15
+    # Convert the mask to uint8 data type and resize it back to the original image size
+    mask = (output_predictions == 15).astype(np.uint8)
+    mask = cv2.resize(mask, (image.shape[1], image.shape[0]), interpolation=cv2.INTER_NEAREST)
+    return mask
 
 cap = cv2.VideoCapture(1)
 cap.set(3, 1280)
@@ -37,13 +40,10 @@ detector = PoseDetector()
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 serverAddressPort = ("127.0.0.1", 5052)
-
 cv2.namedWindow("Image", cv2.WINDOW_NORMAL)
-
 
 while True:
     success, img = cap.read()
-    img = cv2.resize(img, (224, 224))
     mask = segment_human(img, model)
 
     # Apply the mask to the original image
@@ -63,13 +63,8 @@ while True:
 
         sock.sendto(str.encode(str(data)), serverAddressPort)
 
+    # Display the original image without resizing
+    cv2.imshow("Image", img)
 
-    # Resize the image before displaying it
-    scale_factor = 2  # Adjust this value to change the display size
-    img_resized = cv2.resize(img, (img.shape[1] * scale_factor, img.shape[0] * scale_factor))
-
-    # Display the resized image
-    cv2.imshow("Image", img_resized)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-
