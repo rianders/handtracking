@@ -2,9 +2,9 @@ from cvzone.PoseModule import PoseDetector
 import cv2
 import socket
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(2)
 cap.set(3, 1280)
-cap.set(4, 720)
+#cap.set(4, 720)
 success, img = cap.read()
 h, w, _ = img.shape
 detector = PoseDetector()
