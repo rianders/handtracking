@@ -31,8 +31,6 @@ while True:
 
         sock.sendto(str.encode(str(data)), serverAddressPort)
 
-
-  
     
     # Display
     cv2.imshow("Image", img)

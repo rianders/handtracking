@@ -8,6 +8,10 @@ install virtualenv
 Then install project software
 `virtualenv env`
 
+or
+
+`python -m venv env` 
+
 Set up virtual environment on Windows
 `./env/scripts/activate`
 
