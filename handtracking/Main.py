@@ -7,6 +7,7 @@ cap = cv2.VideoCapture(0)
 cap.set(4, 720)
 success, img = cap.read()
 h, w, _ = img.shape
+
 detector = HandDetector(detectionCon=0.8, maxHands=2)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -18,18 +19,24 @@ while True:
     # Find the hand and its landmarks
     hands, img = detector.findHands(img)  # with draw
     # hands = detector.findHands(img, draw=False)  # without draw
-    data = []
 
+    data = []
     if hands:
         # Hand 1
-        hand = hands[0]
-        lmList = hand["lmList"]  # List of 21 Landmark points
-        for lm in lmList:
+        hand1 = hands[0]
+        lmList1 = hand1["lmList"]  # List of 21 Landmark points
+        for lm in lmList1:
             data.extend([lm[0], h - lm[1], lm[2]])
 
-        sock.sendto(str.encode(str(data)), serverAddressPort)
+        # Hand 2 (if detected)
+        if len(hands) == 2:
+            hand2 = hands[1]
+            lmList2 = hand2["lmList"]  # List of 21 Landmark points
+            for lm in lmList2:
+                data.extend([lm[0], h - lm[1], lm[2]])
 
-    
+    sock.sendto(str.encode(str(data)), serverAddressPort)
+
     # Display
     cv2.imshow("Image", img)
     cv2.waitKey(1)
