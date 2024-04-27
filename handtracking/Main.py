@@ -2,7 +2,7 @@ from cvzone.HandTrackingModule import HandDetector
 import cv2
 import socket
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1024)
 
